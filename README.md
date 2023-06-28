@@ -1,6 +1,8 @@
 ## RunZ
 
-一直在用AutoHotKey，之后发现runZ这个工具，发现非常好用，之后AutoHotKey发布了2.0，软件作者也没有更新，九萌生了做AutoHotKey2.0适配的项目。
+一直在用AutoHotKey，之后发现runZ这个工具，发现这对AutoHotKey用户非常友好，把之前写的脚本都集成到了一起，之后AutoHotKey发布了2.0，软件作者也没有更新，就萌生了做AutoHotKey2.0适配的想法。
+
+我用runZ的主要目的是引用程序启动器，文件检索部分不是很在意。
 
 #### 链接
 
