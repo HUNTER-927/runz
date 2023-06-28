@@ -1,9 +1,10 @@
-﻿#NoEnv
-#SingleInstance, Force
+﻿;#NoEnv
+#SingleInstance
 #NoTrayIcon
-#MaxHotkeysPerInterval 200
+;#MaxHotkeysPerInterval 200
+A_MaxHotkeysPerInterval := 200
 
-FileEncoding, utf-8
+FileEncoding utf-8
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
@@ -16,27 +17,31 @@ global g_ConfFile := A_ScriptDir . "\Conf\RunZ.ini"
 ; 自动写入的配置文件
 global g_AutoConfFile := A_ScriptDir . "\Conf\RunZ.auto.ini"
 
+
 if !FileExist(g_ConfFile)
 {
-    FileCopy, %g_ConfFile%.help.txt, %g_ConfFile%
+    FileCopy %g_ConfFile%.help.txt, %g_ConfFile%
 }
 
+;检查配置备份文件
 if (FileExist(g_AutoConfFile ".EasyIni.bak"))
 {
-    MsgBox, % "发现上次写入配置的备份文件：`n"
-        . g_AutoConfFile . ".EasyIni.bak"
-        . "`n确定则将其恢复，否则请手动检查文件内容再继续"
-    FileMove, % g_AutoConfFile ".EasyIni.bak", % g_AutoConfFile
+    MsgBox("发现上次写入配置的备份文件：`n"
+        . %g_AutoConfFile% . ".EasyIni.bak"
+        . "`n确定则将其恢复，否则请手动检查文件内容再继续",,)
+    FileMove % g_AutoConfFile ".EasyIni.bak", % g_AutoConfFile
 }
 else if (!FileExist(g_AutoConfFile))
 {
-    FileAppend, % "; 此文件由 RunZ 自动写入，如需手动修改请先关闭 RunZ ！`n`n"
-        . "[Auto]`n[Rank]`n[History]" , % g_AutoConfFile
+    FileAppend "; 此文件由 RunZ 自动写入，如需手动修改请先关闭 RunZ ！`n`n"
+        . "[Auto]`n[Rank]`n[History]" , g_AutoConfFile
 }
 
+;读取配置文件
 global g_Conf := class_EasyIni(g_ConfFile)
 global g_AutoConf := class_EasyIni(g_AutoConfFile)
 
+;读取皮肤配置文件
 if (g_Conf.Gui.Skin != "")
 {
     global g_SkinConf := class_EasyIni(A_ScriptDir "\Conf\Skins\" g_Conf.Gui.Skin ".ini").Gui
@@ -63,7 +68,7 @@ global g_CurrentCommand
 ; 当前匹配到的所有命令
 global g_CurrentCommandList
 ; 是否启用 TCMatch
-global g_EnableTCMatch = TCMatchOn(g_Conf.Config.TCMatchPath)
+global g_EnableTCMatch := TCMatchOn(g_Conf.Config.TCMatchPath)
 ; 列表第一列的首字母或数字
 global g_FirstChar := Asc(g_SkinConf.FirstChar)
 ; 在列表中显示的行数
@@ -99,12 +104,16 @@ global g_InputArea := "Edit1"
 global g_DisplayArea := "Edit3"
 global g_CommandArea := "Edit4"
 
-FileRead, currentPlugins, %A_ScriptDir%\Core\Plugins.ahk
+;定义当前插件
+currentPlugins := FileRead(%A_ScriptDir% . "\Core\Plugins.ahk")
+;重启标识
 needRestart := false
 
-Loop, Files, %A_ScriptDir%\Plugins\*.ahk
+;插件文件与配置文件比对，并加入插件列表。如果有新插件（配置文件中没定义），则写入Plugins.ahk并重启
+;执行后，文件内容保持一致，但配置文件还是没有
+Loop Files, %A_ScriptDir% . "\Plugins\*.ahk"
 {
-    FileReadLine, firstLine, %A_LoopFileLongPath%, 1
+    firstLine:=FileOpen(A_LoopFileFullPath,"r").ReadLine()
     pluginName := StrSplit(firstLine, ":")[2]
     if (!(g_Conf.GetValue("Plugins", pluginName) == 0))
     {
@@ -114,8 +123,8 @@ Loop, Files, %A_ScriptDir%\Plugins\*.ahk
         }
         else
         {
-            FileAppend, #include *i `%A_ScriptDir`%\Plugins\%pluginName%.ahk`n
-                , %A_ScriptDir%\Core\Plugins.ahk
+            FileAppend "#include *i `%A_ScriptDir`%\Plugins\" . %pluginName% . ".ahk`n"
+                , %A_ScriptDir% . "\Core\Plugins.ahk"
             needRestart := true
         }
     }
@@ -126,24 +135,26 @@ if (needRestart)
     Reload
 }
 
+;配置托盘菜单
 if (g_SkinConf.ShowTrayIcon)
 {
-    Menu, Tray, Icon
-    Menu, Tray, NoStandard
+    A_IconHidden:=0
+    ;Menu, Tray, Icon
+    ;Menu, Tray, NoStandard
     if (g_Conf.Config.RunInBackground)
     {
-        Menu, Tray, Add, 显示 &S, ActivateRunZ
-        Menu, Tray, Default, 显示 &S
-        Menu, Tray, Click, 1
+        A_TrayMenu.Add("显示 &S",ActivateRunZ)
+        ;Menu, Tray, Add, 显示 &S, ActivateRunZ
+        A_TrayMenu.Default:="显示 &S"
+        A_TrayMenu.ClickCount := 1
     }
-    Menu, Tray, Add, 配置 &C, EditConfig
-    Menu, Tray, Add, 帮助 &H, KeyHelp
-    Menu, Tray, Add,
-    Menu, Tray, Add, 重启 &R, RestartRunZ
-    Menu, Tray, Add, 退出 &X, ExitRunZ
+    A_TrayMenu.Add("配置 &C",EditConfig)
+    A_TrayMenu.Add("配置 &C",KeyHelp)
+    A_TrayMenu.Add()
+    A_TrayMenu.Add("重启 &R",RestartRunZ)
+    A_TrayMenu.Add("退出 &X",ExitRunZ)
 }
-
-Menu, Tray, Icon, %A_ScriptDir%\RunZ.ico
+TraySetIcon("%A_ScriptDir%\RunZ.ico")
 
 if (FileExist(g_SearchFileList))
 {
@@ -204,7 +215,7 @@ if (cmdlineArg == "--hide")
 
 Gui, Show, % windowY " w" border * 2 + g_SkinConf.WidgetWidth
     . " h" windowHeight hideWindow, % g_WindowName
-
+WinSet,Transparent,200,A
 if (g_SkinConf.RoundCorner > 0)
 {
     WinSet, Region, % "0-0 w" border * 2 + g_SkinConf.WidgetWidth " h" windowHeight
@@ -360,6 +371,7 @@ PrevPage:
     ControlFocus, %g_InputArea%
 return
 
+;调出主界面
 ActivateRunZ:
     Gui, Show, , % g_WindowName
 
