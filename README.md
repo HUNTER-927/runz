@@ -1,6 +1,6 @@
 ## RunZ
 
-专业的快速启动工具。
+一直在用AutoHotKey，之后发现runZ这个工具，发现非常好用，之后AutoHotKey发布了2.0，软件作者也没有更新，九萌生了做AutoHotKey2.0适配的项目。
 
 #### 链接
 
