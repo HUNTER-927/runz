@@ -156,16 +156,19 @@ if (g_SkinConf.ShowTrayIcon)
 }
 TraySetIcon("%A_ScriptDir%\RunZ.ico")
 
+;加载索引文件
 if (FileExist(g_SearchFileList))
 {
     LoadFiles()
 }
 else
 {
-    GoSub, ReindexFiles
+    ReindexFiles()
 }
 
-Gui, Color, % g_SkinConf.BackgroundColor, % g_SkinConf.EditColor
+;设置界面颜色，ControlColor已取消
+Gui.BackColor := %g_SkinConf.BackgroundColor%
+;Gui, Color, % g_SkinConf.BackgroundColor, % g_SkinConf.EditColor
 
 if (FileExist(A_ScriptDir "\Conf\Skins\" g_SkinConf.BackgroundPicture))
 {
@@ -215,7 +218,9 @@ if (cmdlineArg == "--hide")
 
 Gui, Show, % windowY " w" border * 2 + g_SkinConf.WidgetWidth
     . " h" windowHeight hideWindow, % g_WindowName
+
 WinSet,Transparent,200,A
+
 if (g_SkinConf.RoundCorner > 0)
 {
     WinSet, Region, % "0-0 w" border * 2 + g_SkinConf.WidgetWidth " h" windowHeight
