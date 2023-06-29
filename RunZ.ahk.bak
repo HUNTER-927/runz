@@ -186,20 +186,27 @@ if (g_SkinConf.BorderSize >= 0)
 windowHeight := border * 3 + g_SkinConf.EditHeight + g_SkinConf.DisplayAreaHeight
 
 Gui.SetFont("C" g_SkinConf.FontColor " S" g_SkinConf.FontSize, g_SkinConf.FontName)
-;Gui, Font, % "C" g_SkinConf.FontColor " S" g_SkinConf.FontSize, % g_SkinConf.FontName
-Gui, Add, Edit, % "x" border " y" border " gProcessInputCommand -WantReturn"
-        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,
-Gui, Add, Edit, y+0 w0 h0 ReadOnly -WantReturn
-Gui, Add, Button, y+0 w0 h0 Default gRunCurrentCommand
-Gui, Add, Edit, % "y+" border " -VScroll ReadOnly -WantReturn"
-        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.DisplayAreaHeight
-        , % AlignText(SearchCommand("", true))
+Gui.AddEdit("x" border " y" border " gProcessInputCommand -WantReturn"
+        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,)
+;Gui, Add, Edit, % "x" border " y" border " gProcessInputCommand -WantReturn"
+;        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,
+;Gui, Add, Edit, y+0 w0 h0 ReadOnly -WantReturn
+Gui.AddEdit(y+0 w0 h0 ReadOnly -WantReturn,)
+Gui.AddButton(y+0 w0 h0 Default,gRunCurrentCommand)
+;Gui, Add, Button, y+0 w0 h0 Default gRunCurrentCommand
+Gui.AddEdit("y+" border " -VScroll ReadOnly -WantReturn" . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.DisplayAreaHeight , AlignText(SearchCommand("", true)))
+;Gui, Add, Edit, % "y+" border " -VScroll ReadOnly -WantReturn"
+;        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.DisplayAreaHeight
+;        , % AlignText(SearchCommand("", true))
 
 if (g_SkinConf.ShowCurrentCommand)
 {
-    Gui, Add, Edit, % "y+" border " ReadOnly"
+    Gui.AddEdit("y+" border " ReadOnly"
         . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,
-    windowHeight += border + g_SkinConf.EditHeight
+    windowHeight += border + g_SkinConf.EditHeight)
+;    Gui, Add, Edit, % "y+" border " ReadOnly"
+;        . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,
+;    windowHeight += border + g_SkinConf.EditHeight
 }
 
 if (g_SkinConf.ShowInputBoxOnlyIfEmpty)
