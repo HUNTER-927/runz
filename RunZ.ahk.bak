@@ -166,15 +166,18 @@ else
     ReindexFiles()
 }
 
-;设置界面颜色
+;设置界面颜色，ControlColor已取消
 Gui.BackColor := %g_SkinConf.BackgroundColor%
-Gui, Color, % g_SkinConf.BackgroundColor, % g_SkinConf.EditColor
+;Gui, Color, % g_SkinConf.BackgroundColor, % g_SkinConf.EditColor
 
+;根据配置文件设置背景
 if (FileExist(A_ScriptDir "\Conf\Skins\" g_SkinConf.BackgroundPicture))
 {
-    Gui, Add, Picture, x0 y0, % A_ScriptDir "\Conf\Skins\" g_SkinConf.BackgroundPicture
+    Gui.AddPicture("w-1 h-1", A_ScriptDir "\Conf\Skins\" g_SkinConf.BackgroundPicture)
+    ;Gui, Add, Picture, x0 y0, % A_ScriptDir "\Conf\Skins\" g_SkinConf.BackgroundPicture
 }
 
+;设置边框宽度
 border := 10
 if (g_SkinConf.BorderSize >= 0)
 {
@@ -182,7 +185,8 @@ if (g_SkinConf.BorderSize >= 0)
 }
 windowHeight := border * 3 + g_SkinConf.EditHeight + g_SkinConf.DisplayAreaHeight
 
-Gui, Font, % "C" g_SkinConf.FontColor " S" g_SkinConf.FontSize, % g_SkinConf.FontName
+Gui.SetFont("C" g_SkinConf.FontColor " S" g_SkinConf.FontSize, g_SkinConf.FontName)
+;Gui, Font, % "C" g_SkinConf.FontColor " S" g_SkinConf.FontSize, % g_SkinConf.FontName
 Gui, Add, Edit, % "x" border " y" border " gProcessInputCommand -WantReturn"
         . " w" g_SkinConf.WidgetWidth " h" g_SkinConf.EditHeight,
 Gui, Add, Edit, y+0 w0 h0 ReadOnly -WantReturn
